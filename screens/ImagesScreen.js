@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Image, FlatList, Button } from "react-native";
+import { View, StyleSheet, Image, FlatList, Button } from "react-native";
 import * as FileSystem from "expo-file-system";
 import singleFileUploader from "single-file-uploader";
 
 export default function ImagesScreen() {
   const [images, setImage] = useState([]);
-
   useEffect(() => {
     (async () => {
       const images = await FileSystem.readDirectoryAsync(
@@ -14,7 +13,7 @@ export default function ImagesScreen() {
       console.log("images", images);
       setImage(images);
     })();
-  }, []);
+  }, [images]);
 
   return images.length > 0 ? (
     <FlatList
@@ -33,29 +32,47 @@ export default function ImagesScreen() {
                   itemData.item,
               }}
             />
-            <Button
-              title="upload"
-              onPress={async () => {
-                try {
-                  await singleFileUploader({
-                    distantUrl:
-                      "https://wildstagram.nausicaa.wilders.dev/upload",
+            <View style={styles.fixToText}>
+              <Button
+                title="upload"
+                onPress={async () => {
+                  try {
+                    await singleFileUploader({
+                      distantUrl:
+                        "https://wildstagram.nausicaa.wilders.dev/upload",
 
-                    filename: itemData.item,
-                    filetype: "image/jpeg",
-                    formDataName: "fileData",
-                    localUri:
+                      filename: itemData.item,
+                      filetype: "image/jpeg",
+                      formDataName: "fileData",
+                      localUri:
+                        FileSystem.cacheDirectory +
+                        "ImageManipulator/" +
+                        itemData.item,
+                    });
+
+                    alert("Uploaded");
+                  } catch (err) {
+                    alert("Error");
+                  }
+                }}
+              />
+              <Button
+                title="Delete"
+                onPress={async () => {
+                  try {
+                    console.log("itemdata", itemData);
+                    await FileSystem.deleteAsync(
                       FileSystem.cacheDirectory +
-                      "ImageManipulator/" +
-                      itemData.item,
-                  });
-
-                  alert("Uploaded");
-                } catch (err) {
-                  alert("Error");
-                }
-              }}
-            />
+                        "ImageManipulator/" +
+                        itemData.item
+                    );
+                    alert("Deleted");
+                  } catch (err) {
+                    alert("Error");
+                  }
+                }}
+              />
+            </View>
           </>
         );
       }}
@@ -66,7 +83,11 @@ export default function ImagesScreen() {
 const styles = StyleSheet.create({
   image: {
     resizeMode: "cover",
-
     height: 500,
   },
+  fixToText: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
 });
+
