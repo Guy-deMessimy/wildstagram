@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Image, FlatList, SafeAreaView } from "react-native";
+import { Text, StyleSheet, Image, FlatList, Button } from "react-native";
 import * as FileSystem from "expo-file-system";
+import singleFileUploader from "single-file-uploader";
 
 export default function ImagesScreen() {
   const [images, setImage] = useState([]);
@@ -22,13 +23,40 @@ export default function ImagesScreen() {
       renderItem={(itemData) => {
         console.log("item", itemData);
         return (
-          <Image
-            style={styles.image}
-            source={{
-              uri:
-                FileSystem.cacheDirectory + "ImageManipulator/" + itemData.item,
-            }}
-          />
+          <>
+            <Image
+              style={styles.image}
+              source={{
+                uri:
+                  FileSystem.cacheDirectory +
+                  "ImageManipulator/" +
+                  itemData.item,
+              }}
+            />
+            <Button
+              title="upload"
+              onPress={async () => {
+                try {
+                  await singleFileUploader({
+                    distantUrl:
+                      "https://wildstagram.nausicaa.wilders.dev/upload",
+
+                    filename: itemData.item,
+                    filetype: "image/jpeg",
+                    formDataName: "fileData",
+                    localUri:
+                      FileSystem.cacheDirectory +
+                      "ImageManipulator/" +
+                      itemData.item,
+                  });
+
+                  alert("Uploaded");
+                } catch (err) {
+                  alert("Error");
+                }
+              }}
+            />
+          </>
         );
       }}
     />
