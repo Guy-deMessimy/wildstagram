@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Image, FlatList, Button } from "react-native";
+import { View, StyleSheet, Image, FlatList, Button, Alert } from "react-native";
 import * as FileSystem from "expo-file-system";
 import singleFileUploader from "single-file-uploader";
 
@@ -14,6 +14,20 @@ export default function ImagesScreen() {
       setImage(images);
     })();
   }, [images]);
+
+  createDeletedAlert = () =>
+    Alert.alert("Alert Title", "My Alert Msg", [
+      {
+        text: "Ask me later",
+        onPress: () => console.log("Ask me later pressed"),
+      },
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "OK", onPress: () => console.log("OK Pressed") },
+    ]);
 
   return images.length > 0 ? (
     <FlatList
@@ -66,7 +80,10 @@ export default function ImagesScreen() {
                         "ImageManipulator/" +
                         itemData.item
                     );
-                    alert("Deleted");
+                    // alert("Deleted");
+                    {
+                      createDeletedAlert;
+                    }
                   } catch (err) {
                     alert("Error");
                   }
